@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.deepeval/
+report/
+agent_evaluations/latest_llm_evaluation_report.txt
+.coverage
+htmlcov/
+.venv/
+dist/
+build/
+*.egg-info/
+.env
+
+# Local credentials and generated assets
+auth.json
+.env.*
+!.env.example
+report-assets/

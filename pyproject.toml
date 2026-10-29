@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "refund-agent"
+version = "0.1.0"
+description = "A minimal, tool-using e-commerce refund agent built for evaluation."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "deepeval==4.1.4",
+    "openai>=2.0,<3",
+]
+
+[project.scripts]
+refund-agent = "refund_agent.command_line_interface:main"
+
+[tool.setuptools.packages.find]
+include = ["refund_agent*"]
+
+[tool.pytest.ini_options]
+disable_test_id_escaping_and_forfeit_all_rights_to_community_support = true
+markers = [
+    "llm_eval: calls the target LLM and an LLM judge",
+    "no_llm_eval: evaluates the deterministic agent without any LLM calls",
+]

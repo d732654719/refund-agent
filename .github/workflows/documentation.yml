@@ -1,0 +1,27 @@
+name: Documentation
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check map links and remind about module notes
+        env:
+          DOCS_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ -n "$DOCS_BASE" ]; then
+            python3 scripts/check_docs.py --base "$DOCS_BASE"
+          else
+            python3 scripts/check_docs.py
+          fi
