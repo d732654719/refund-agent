@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "deepeval==4.1.4",
+    "langfuse>=4,<5",
     "openai>=2.0,<3",
 ]
 
@@ -17,7 +18,7 @@ dependencies = [
 refund-agent = "refund_agent.command_line_interface:main"
 
 [tool.setuptools.packages.find]
-include = ["refund_agent*"]
+include = ["refund_agent*", "agent_observability*"]
 
 [tool.pytest.ini_options]
 disable_test_id_escaping_and_forfeit_all_rights_to_community_support = true

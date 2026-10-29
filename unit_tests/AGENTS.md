@@ -10,6 +10,7 @@
 | 状态目录、CLI、认证配置 | [test_agent_status_catalog.py](test_agent_status_catalog.py)、[test_command_line_interface.py](test_command_line_interface.py)、[test_model_runtime.py](test_model_runtime.py) |
 | DeepEval 转换与多轮契约 | [test_evaluation_adapters.py](test_evaluation_adapters.py) |
 | 报告数据、写入、pytest 生命周期 | [test_evaluation_report_session.py](test_evaluation_report_session.py)、[test_evaluation_report_writer.py](test_evaluation_report_writer.py)、[test_evaluation_report_hooks.py](test_evaluation_report_hooks.py) |
+| 观测降级与实验编排 | [test_langfuse_observability.py](test_langfuse_observability.py)、[test_langfuse_golden_experiment.py](test_langfuse_golden_experiment.py)；使用替身，不证明云端落地 |
 
 ## 运行与约束
 

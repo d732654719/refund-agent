@@ -42,6 +42,8 @@
 | 改状态或工具结果需要同步什么？ | 运行模块的状态目录、[状态指南](../agent_status_guide.md) 与 [评测模块](../agent_evaluations/AGENTS.md) |
 | 报告 JSON 谁组装，HTML 应改哪里？ | 评测模块的 session/writer 与项目的共享依赖说明 |
 | 哪些测试离线，哪些会调用模型？ | [单元验证](../unit_tests/AGENTS.md) 与评测入口 |
+| 观测缺少凭据和实验缺少凭据为何处理不同？ | [观测模块](../agent_observability/AGENTS.md) |
+| 云端 Dataset 是否会删除旧条目，实验是否等同完整 Judge？ | 评测模块的 Langfuse 数据集与实验说明 |
 
 ## 谁负责
 

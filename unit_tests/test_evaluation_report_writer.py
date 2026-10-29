@@ -241,6 +241,11 @@ def test_report_template_keeps_text_clear_of_visual_boundaries_and_closes_dialog
     assert ".case-list::-webkit-scrollbar-button" in html and "display:none!important" in html
     assert "本报告由本次评估保存的运行数据生成，可离线查看。" not in html
     assert "数据来源：运行评估程序生成的评测数据" in html
+    assert "模型调用明细" not in html
+    assert "function renderRuntimeEvents(turn)" in html
+    assert "运行事件时间线" not in html
+    assert "运行事件 · ${events.length} 条" in html
+    assert "模型原始输出" in html
     assert "width:1600px;max-width:100%" in html
     assert 'id="report-summary"' in html
     assert ">成功/未通过<" in html

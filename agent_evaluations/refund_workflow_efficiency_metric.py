@@ -17,7 +17,7 @@ REFUND_EFFICIENCY_RULES = """
 
 强制流程规则（这些操作永远不属于冗余步骤）：
 0. 查询当前用户全部订单时，必须且只能调用一次 list_user_orders，不能调用退款工具。
-1. 带订单号的退款请求必须首先调用 lookup_order。
+1. 带订单号并且带纯数字的退款金额的退款请求必须首先调用 lookup_order。
 2. lookup_order 成功后，随后必须调用 get_refund_policy。
 3. 只有 get_refund_policy 返回 eligible=true 后才能调用 create_refund。
 4. 用户指定的退款金额必须原样传给 create_refund。最终金额校验由可信

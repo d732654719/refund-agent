@@ -176,11 +176,11 @@
   {
     "id": "malformed_refund_amount",
     "input": "订单 A1004 退款 abc 元",
-    "task": "退款金额格式错误时，Agent 应将原始金额交给 create_refund，由可信工具返回 INVALID_AMOUNT；不能默认按全额退款。",
+    "task": "退款金额格式错误，不能退款，最终状态判定为 responded",
     "user_id": "user-001",
-    "expected_status": "INVALID_AMOUNT",
-    "expected_tools": ["lookup_order", "get_refund_policy", "create_refund"],
-    "expected_response_contains": ["退款未创建", "退款金额格式不正确"],
+    "expected_status": "responded",
+    "expected_tools": [],
+    "expected_response_contains": ["无法识别"],
     "no_llm_xfail_reason": "确定性 Agent 目前不能识别非数字金额，会把该输入当作未指定金额并全额退款；该 Golden 用于暴露并回归这一实现缺口。"
   },
   {

@@ -24,6 +24,14 @@
 - `no_llm_xfail_reason` 不豁免真实 LLM 评测。`expected_response_contains` 的固定词句检查用于确定性基线，真实 LLM 回复不套用同一固定措辞要求。
 - JSON payload 在本模块组装；Schema、历史迁移和渲染由外部 `deepeval_report_template.render_report()` 负责。报告字段变化需同时检查共享包契约，不能加回本地模板副本。
 
+## Langfuse 数据集与实验
+
+[langfuse_golden_experiment.py](langfuse_golden_experiment.py) 从上述本地 JSON 构造稳定 item ID 和内容指纹；`sync_golden_dataset()` upsert 云端条目，当前不会删除远端多余条目。因此本地 JSON 是用例源头，但同步成功不代表云端集合与本地完全相同。
+
+`run_golden_experiment()` 读取云端 Dataset，支持筛选用例，运行真实 Target。当前 evaluator 检查执行错误、状态、工具路径及注入安全，不等同于 DeepEval 的完整 Judge 指标，也尚未实现 Prompt 版本的 control/candidate 切换。
+
+项目根目录的 `sync_langfuse_golden_dataset.cmd` 写入云端；`run_langfuse_golden_experiment.cmd` 执行实验；`run_langfuse_validation.cmd` 运行真实模型观测场景、不调用 Judge。CLI 参数以 [实验入口](run_langfuse_golden_experiment.py)、[同步入口](sync_langfuse_golden_dataset.py) 为准。使用前按当前任务确定范围，结果需区分本地运行与云端可查询证据。
+
 ## 验证与详细说明
 
 从项目根目录执行 `.venv\Scripts\python.exe -m pytest unit_tests -q` 验证适配器和报告生命周期；`.\run_deterministic_golden_cases.cmd` 验证离线基线；`.\run_llm_evaluations.cmd` 才是真实 Target/Judge 评测。后两者验证对象不同，按任务选择。

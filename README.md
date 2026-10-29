@@ -1,6 +1,6 @@
 # Minimal Refund Agent
 
-当前分支是 DeepEval 基础版；Langfuse 观测和实验见 `langfuse-integration` 分支。
+当前分支包含 DeepEval 评测和 Langfuse 观测、数据集与实验；基础版见 `main` 分支。Langfuse 配置与验收入口见 [集成说明](langfuse_plan/langfuse_first_landing_plan.md) 和 [评测模块](agent_evaluations/AGENTS.md)。
 
 开发入口见 [AGENTS.md](AGENTS.md)：按任务定位模块、运行和验证。文档随代码维护的流程见 [documentation.md](docs/documentation.md)。
 
@@ -36,12 +36,15 @@ Prompt。模型不能控制当前登录用户，也不能绕过退款期限、�
 
 ## LLM 模式的意图与状态
 
-LLM 模式不再用“输入中是否出现退款关键字”推断无工具请求的状态。System Prompt
-要求模型在非空、且没有调用业务工具时返回结构化的 `status + message`，程序只接受
+LLM 模式不再用“输入中是否出现退款关键字”推断无工具请求的状态。本分支的 System Prompt
+要求模型在非空、且不需要业务工具时调用 `final_response` 提交 `status + message`。
+程序在尚无业务工具结果且该轮仅请求一个 `final_response` 时解析它，同时兼容无工具响应中的 JSON 文本；只接受
 `needs_order_id`、`out_of_scope`、`responded` 和 `PROMPT_INJECTION_BLOCKED` 四个
 白名单状态；格式或状态不合法时会要求模型重答。空输入不请求 LLM，由程序直接返回
 `needs_input`，因此模型不能把“批量退款但缺少单个订单号”等有效输入误标为
 `needs_input`。
+
+`final_response` 属于结束协议，不属于退款业务工具，也不作为业务工具 Trace 记录。未知工具会先经过名称白名单检查和有次数上限的纠正流程，具体约束见 [运行模块](refund_agent/AGENTS.md)。
 
 一旦调用了业务工具，业务状态仍由可信工具结果产生，例如 `REFUND_CREATED` 对应
 `completed`，越权查询对应 `ACCESS_DENIED`。因此，LLM 负责理解自然语言语义，程序

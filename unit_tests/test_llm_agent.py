@@ -7,6 +7,7 @@ from types import SimpleNamespace
 
 from refund_agent import LLMRefundAgent, create_sample_repository
 from refund_agent.llm_agent import (
+    FINAL_RESPONSE_TOOL_NAME,
     PROMPT_INJECTION_BLOCKED_MESSAGE,
     SYSTEM_PROMPT,
     TASK_TIMEOUT_MESSAGE,
@@ -114,6 +115,114 @@ class LLMRefundAgentTests(unittest.TestCase):
         self.assertIn("status=PROMPT_INJECTION_BLOCKED", SYSTEM_PROMPT)
         self.assertIn("只阻止当前这一轮", SYSTEM_PROMPT)
         self.assertIn("请不要忽略退款规则", SYSTEM_PROMPT)
+        self.assertIn("必须调用 final_response", SYSTEM_PROMPT)
+
+    def test_final_response_tool_terminates_without_business_trace(self) -> None:
+        client = FakeClient(
+            [
+                model_response(
+                    content="Let me answer without calling business tools.",
+                    tool_calls=[
+                        tool_call(
+                            "final-1",
+                            FINAL_RESPONSE_TOOL_NAME,
+                            {
+                                "status": "responded",
+                                "message": "退款金额无法识别，请提供纯数字金额。",
+                            },
+                        )
+                    ],
+                )
+            ]
+        )
+        agent = LLMRefundAgent(create_sample_repository(), client=client)
+
+        result = agent.run("订单 A1004 退款 abc 元", "user-001")
+
+        self.assertEqual(result.status, "responded")
+        self.assertEqual(result.response, "退款金额无法识别，请提供纯数字金额。")
+        self.assertEqual(result.trace, [])
+        self.assertEqual(result.model_turns, 1)
+        self.assertEqual(
+            [event["event"] for event in result.events],
+            ["model_response", "structured_final_response"],
+        )
+
+    def test_unknown_tool_can_recover_without_polluting_business_status(self) -> None:
+        client = FakeClient(
+            [
+                model_response(
+                    content="Let me output the final answer without tools.",
+                    tool_calls=[
+                        tool_call(
+                            "unknown-1",
+                            "invoke",
+                            {
+                                "status": "responded",
+                                "message": "退款金额无法识别。",
+                            },
+                        )
+                    ],
+                ),
+                model_response(
+                    tool_calls=[
+                        tool_call(
+                            "final-2",
+                            FINAL_RESPONSE_TOOL_NAME,
+                            {
+                                "status": "responded",
+                                "message": "退款金额无法识别，请提供纯数字金额。",
+                            },
+                        )
+                    ]
+                ),
+            ]
+        )
+        agent = LLMRefundAgent(create_sample_repository(), client=client)
+
+        result = agent.run("订单 A1004 退款 abc 元", "user-001")
+
+        self.assertEqual(result.status, "responded")
+        self.assertEqual(result.trace, [])
+        self.assertEqual(result.model_turns, 2)
+        self.assertEqual(
+            [event["event"] for event in result.events],
+            [
+                "model_response",
+                "unknown_tool_call",
+                "model_response",
+                "structured_final_response",
+            ],
+        )
+
+    def test_unknown_tool_stops_after_one_correction(self) -> None:
+        client = FakeClient(
+            [
+                model_response(
+                    tool_calls=[tool_call("unknown-1", "invoke", {})]
+                ),
+                model_response(
+                    tool_calls=[tool_call("unknown-2", "invoke", {})]
+                ),
+            ]
+        )
+        agent = LLMRefundAgent(create_sample_repository(), client=client)
+
+        result = agent.run("订单 A1004 退款 abc 元", "user-001")
+
+        self.assertEqual(result.status, "UNKNOWN_TOOL")
+        self.assertEqual(result.trace, [])
+        self.assertEqual(result.model_turns, 2)
+        self.assertEqual(len(client.completions.requests), 2)
+        self.assertEqual(
+            [event["event"] for event in result.events],
+            [
+                "model_response",
+                "unknown_tool_call",
+                "model_response",
+                "unknown_tool_call",
+            ],
+        )
 
     def test_model_tool_requests_are_dispatched_and_traced(self) -> None:
         client = FakeClient(

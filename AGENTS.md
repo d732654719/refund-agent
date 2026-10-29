@@ -1,11 +1,11 @@
-# Refund Agent 项目入口
+# Refund Agent Langfuse 项目入口
 
 ## 这是什么项目
 
-本分支提供 LLM 退款 Agent、确定性基线与 DeepEval 评测；`langfuse-integration` 分支增加 Langfuse 集成。
+本分支在退款 Agent 和 DeepEval 上集成 Langfuse 观测、数据集和实验；`main` 是 DeepEval 基础版。
 报告模板由 [独立报告仓库](https://github.com/d732654719/deepeval-report-template) 提供，通过 [requirements-report.txt](requirements-report.txt) 安装固定版本；不要在本项目复制模板、Schema 或渲染器。
 
-先运行 `git status --short --branch` 核对分支与已有改动。公共修复按任务范围同步，不要顺带引入 Langfuse 专属能力；保留无关改动，只暂存本次确认的文件。
+先运行 `git status --short --branch` 核对分支与已有改动。公共修复按任务范围同步，Langfuse 专属能力留在本分支；保留无关改动，只暂存本次确认的文件。
 
 ## 按任务找模块
 
@@ -14,7 +14,8 @@
 | 要改什么 | 入口 |
 | --- | --- |
 | 退款行为、模型协议、工具与状态 | [refund_agent/AGENTS.md](refund_agent/AGENTS.md) |
-| 用例、指标、报告数据 | [agent_evaluations/AGENTS.md](agent_evaluations/AGENTS.md) |
+| 用例、指标、报告数据、云端实验 | [agent_evaluations/AGENTS.md](agent_evaluations/AGENTS.md) |
+| Langfuse 上报、降级与 Trace 关联 | [agent_observability/AGENTS.md](agent_observability/AGENTS.md) |
 | 单元验证与回归范围 | [unit_tests/AGENTS.md](unit_tests/AGENTS.md) |
 | 文档同步与新会话复核 | [docs/documentation.md](docs/documentation.md) |
 
@@ -44,5 +45,5 @@
 .venv\Scripts\python.exe scripts/check_docs.py
 ```
 
-离线测试通过不能证明真实模型稳定；按实际改动选择检查，不为纯文档变更新增业务测试。
+数据集同步、观测验收和云端实验的入口与限制见评测模块说明；不要把离线替身测试当作云端验收。
 修改代码时同步检查模块说明；不需要改文档时在交付中写明原因。计划或历史结果不能替代本次验证证据。

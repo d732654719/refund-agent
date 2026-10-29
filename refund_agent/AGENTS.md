@@ -26,7 +26,11 @@
 
 ## 本分支协议
 
-无业务工具结果时，当前实现用 `_parse_no_tool_response()` 解析模型 `content` 中的 `status + message` JSON，并校验状态白名单。不要将另一个 worktree 的 `final_response` 协议当成本分支已实现的接口。
+当前实现先检查 `ALLOWED_TOOL_NAMES`，再处理参数；未知工具走有次数上限的纠正流程，该轮不执行业务工具。
+
+尚无业务工具结果、且仅请求一个 `final_response` 时，用其 `status + message` 参数结束；代码仍兼容无工具响应中的 JSON 文本。它不是任意阶段都可调用的退款工具，也不写成业务 Trace。
+
+观测适配器通过构造参数 `observability` 注入；`run()` 另接受 `session_id`、`trace_id`、`experiment_trace_id`。SDK 连接与上报边界见 [观测模块](../agent_observability/AGENTS.md)，不要把 Langfuse 配置变成退款资格。
 
 ## 修改后检查
 
